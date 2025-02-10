@@ -1,0 +1,148 @@
+@host = http://localhost:3000
+@contentType = application/json
+@token = {{login.response.body.accessToken}}
+@refreshToken = {{login.response.body.refreshToken}}
+@documentId = {{createDocument.response.body.id}}
+@userId = {{login.response.body.user.id}}
+
+### ===========================================
+### SYSTEM & HEALTH
+### ===========================================
+
+### Check System Health
+GET {{host}}/health
+
+### Get System Metrics
+GET {{host}}/metrics
+
+### Readiness Probe
+GET {{host}}/ready
+
+### Liveness Probe
+GET {{host}}/live
+
+### ===========================================
+### AUTHENTICATION
+### ===========================================
+
+### Register New User
+# @name register
+POST {{host}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+    "email": "test@example.com",
+    "password": "password123",
+    "name": "Test User"
+}
+
+### Login
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "test@example.com",
+    "password": "password123"
+}
+
+### Refresh Token
+POST {{host}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### Logout
+POST {{host}}/api/auth/logout
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### ===========================================
+### DOCUMENTS
+### ===========================================
+
+### Create Document
+# @name createDocument
+POST {{host}}/api/documents
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "title": "My Project Plan",
+    "content": "Initial content"
+}
+
+### List My Documents (Owned)
+GET {{host}}/api/documents
+Authorization: Bearer {{token}}
+
+### List All Documents (Owned + Shared)
+GET {{host}}/api/documents/all
+Authorization: Bearer {{token}}
+
+### Get Document by ID
+GET {{host}}/api/documents/{{documentId}}
+Authorization: Bearer {{token}}
+
+### Update Document
+PUT {{host}}/api/documents/{{documentId}}
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "title": "Updated Project Plan",
+    "content": "Updated content"
+}
+
+### Delete Document
+DELETE {{host}}/api/documents/{{documentId}}
+Authorization: Bearer {{token}}
+
+### ===========================================
+### COLLABORATION
+### ===========================================
+
+### Set Document Visibility (Public/Private)
+PUT {{host}}/api/documents/{{documentId}}/visibility
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "isPublic": true
+}
+
+### Add Collaborator
+# Note: You need another registered user's email
+POST {{host}}/api/documents/{{documentId}}/collaborators
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "email": "colleague@example.com",
+    "role": "editor"
+}
+
+### List Collaborators
+GET {{host}}/api/documents/{{documentId}}/collaborators
+Authorization: Bearer {{token}}
+
+### Update Collaborator Role
+# Replace :userId with actual user ID from the list response
+PUT {{host}}/api/documents/{{documentId}}/collaborators/:userId
+Authorization: Bearer {{token}}
+Content-Type: {{contentType}}
+
+{
+    "role": "viewer"
+}
+
+### Remove Collaborator
+# Replace :userId with actual user ID
+DELETE {{host}}/api/documents/{{documentId}}/collaborators/:userId
+Authorization: Bearer {{token}}
