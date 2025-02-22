@@ -30,8 +30,9 @@ export class DocumentController {
       }
       
       res.json(document);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to get document' });
+    } catch (error: any) {
+      console.error('Get document error:', error);
+      res.status(500).json({ error: 'Failed to get document', details: error.message });
     }
   }
 
