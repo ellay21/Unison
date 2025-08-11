@@ -4,8 +4,11 @@ import { Strategy as GitHubStrategy, Profile as GithubProfile } from 'passport-g
 import { config } from './config';
 import { userService } from '../services/userService';
 
+
 export const setupPassport = () => {
+
   // Google OAuth Strategy
+
   passport.use(new GoogleStrategy({
     clientID: config.google.clientId,
     clientSecret: config.google.clientSecret,
@@ -15,7 +18,9 @@ export const setupPassport = () => {
     _refreshToken: string,
     profile: GoogleProfile,
     done: GoogleVerifyCallback,
+
   ) => {
+
     try {
       const user = await userService.findOrCreateOAuthUser({
         email: profile.emails?.[0]?.value || '',
@@ -27,10 +32,15 @@ export const setupPassport = () => {
       return done(null, user);
     } catch (error) {
       return done(error as Error);
+
     }
+
   }));
 
+
+
   // GitHub OAuth Strategy
+
   passport.use(new GitHubStrategy({
     clientID: config.github.clientId,
     clientSecret: config.github.clientSecret,
@@ -40,7 +50,7 @@ export const setupPassport = () => {
     _accessToken: string,
     _refreshToken: string,
     profile: GithubProfile,
-    done: (error: Error | null, user?: any | false) => void 
+    done: (error: Error | null, user?: any | false) => void
   ) => {
     try {
       const user = await userService.findOrCreateOAuthUser({
@@ -56,8 +66,8 @@ export const setupPassport = () => {
     }
   }));
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
+  passport.serializeUser((user: any, done) => {
+    done(null, user.id)
   });
 
   passport.deserializeUser(async (id: string, done) => {

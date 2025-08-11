@@ -19,6 +19,7 @@ export const config = {
   jwtRefreshExpiresIn: '7d',
   
   // OAuth
+  sessionSecret : process.env.SESSION_SECRET,
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -37,6 +38,7 @@ const requiredEnvVars = [
   'DATABASE_URL',
   'JWT_SECRET',
   'JWT_REFRESH_SECRET',
+  'SESSION_SECRET',
 ];
 
 for (const envVar of requiredEnvVars) {
