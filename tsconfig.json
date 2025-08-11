@@ -27,7 +27,11 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": "./src", 
+    "paths": { 
+      "utils/*": ["utils/*"]
+    }
   },
   "include": [
     "src/**/*",
