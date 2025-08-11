@@ -1,0 +1,390 @@
+### Collaboration Platform API Testing
+### Base URL: http://localhost:3000
+
+### Health Check
+GET http://localhost:3000/health
+Content-Type: application/json
+
+### Expected Response:
+# {
+#   "status": "OK",
+#   "timestamp": "2024-01-15T12:30:45.123Z",
+#   "uptime": 3600.5,
+#   "checks": {
+#     "database": "healthy",
+#     "redis": "healthy"
+#   }
+# }
+
+###
+
+### Register New User
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "n@mail.com",
+  "name": "n smith",
+  "password": "securepassword123"
+}
+
+### Expected Response (201 Created):
+# {
+#   "user": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null,
+#     "provider": "local",
+#     "createdAt": "2024-01-15T10:30:00.000Z",
+#     "updatedAt": "2024-01-15T10:30:00.000Z"
+#   },
+#   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+# }
+
+###
+
+### Login with Email and Password
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "securepassword123"
+}
+
+### Expected Response (200 OK):
+# {
+#   "user": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null,
+#     "provider": "local",
+#     "createdAt": "2024-01-15T10:30:00.000Z",
+#     "updatedAt": "2024-01-15T10:30:00.000Z"
+#   },
+#   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+# }
+
+###
+
+### Refresh Access Token
+POST http://localhost:3000/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MGQ1MjUwNC0xZjg0LTRmMWItYmU0OC04YWFlZjI4Y2YxNWIiLCJpYXQiOjE3NTQ5MzQ2MDIsImV4cCI6MTc1NTUzOTQwMn0.aZJonVX3LK9P0FBhZ7_3sKxsmCwa2jXMULzQUFRzQTM"
+}
+
+### Expected Response (200 OK):
+# {
+#   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null,
+#     "provider": "local",
+#     "createdAt": "2024-01-15T10:30:00.000Z",
+#     "updatedAt": "2024-01-15T10:30:00.000Z"
+#   }
+# }
+
+###
+
+### Logout User
+POST http://localhost:3000/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJpYXQiOjE3MDUzMTQ2MDAsImV4cCI6MTcwNTkxOTQwMH0.def456"
+}
+
+### Expected Response (200 OK):
+# {
+#   "message": "Logged out successfully"
+# }
+
+###
+
+### Google OAuth Initiation
+GET http://localhost:3000/api/auth/google
+
+### Expected Response (302 Redirect):
+# Location: https://accounts.google.com/oauth/authorize?response_type=code&client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgoogle%2Fcallback&scope=profile%20email
+
+###
+
+### GitHub OAuth Initiation
+GET http://localhost:3000/api/auth/github
+
+### Expected Response (302 Redirect):
+# Location: https://github.com/login/oauth/authorize?response_type=code&client_id=YOUR_GITHUB_CLIENT_ID&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fgithub%2Fcallback&scope=user%3Aemail
+
+###
+
+### Create New Document
+POST http://localhost:3000/api/documents
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MWE5ZWE5Ni1lZDg1LTRjM2UtOWVmYS0wMzJhNWZhMGFkYzQiLCJlbWFpbCI6InBhbmRhQG1haWwuY29tIiwiaWF0IjoxNzU0OTQyNjU0LCJleHAiOjE3NTQ5NDM1NTR9.0ZrApwiWh7pk2v5ThuNrhjFLrzvGlHm-0JlceBG-DPE
+Content-Type: application/json
+
+{
+  "title": "My Project Proposal",
+  "content": "This is the initial content of my document. It will be converted to Yjs format automatically."
+}
+
+### Expected Response (201 Created):
+# {
+#   "id": "123e4567-e89b-12d3-a456-426614174000",
+#   "title": "My Project Proposal",
+#   "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+fw==",
+#   "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+#   "createdAt": "2024-01-15T10:35:00.000Z",
+#   "updatedAt": "2024-01-15T10:35:00.000Z",
+#   "owner": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null
+#   }
+# }
+
+###
+
+### List User's Documents
+GET http://localhost:3000/api/documents
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+### Expected Response (200 OK):
+# [
+#   {
+#     "id": "123e4567-e89b-12d3-a456-426614174000",
+#     "title": "My Project Proposal",
+#     "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+fw==",
+#     "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+#     "createdAt": "2024-01-15T10:35:00.000Z",
+#     "updatedAt": "2024-01-15T10:35:00.000Z",
+#     "owner": {
+#       "id": "550e8400-e29b-41d4-a716-446655440000",
+#       "email": "john.doe@example.com",
+#       "name": "John Doe",
+#       "avatar": null
+#     }
+#   }
+# ]
+
+###
+
+### Get Document by ID
+GET http://localhost:3000/api/documents/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+### Expected Response (200 OK):
+# {
+#   "id": "123e4567-e89b-12d3-a456-426614174000",
+#   "title": "My Project Proposal",
+#   "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+fw==",
+#   "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+#   "createdAt": "2024-01-15T10:35:00.000Z",
+#   "updatedAt": "2024-01-15T10:35:00.000Z",
+#   "owner": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null
+#   }
+# }
+
+###
+
+### Update Document (Full Update)
+PATCH  http://localhost:3000/api/documents/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "title": "Updated Project Proposal",
+  "content": "This is the updated content with new information and additional details."
+}
+
+### Expected Response (200 OK):
+# {
+#   "id": "123e4567-e89b-12d3-a456-426614174000",
+#   "title": "Updated Project Proposal",
+#   "content": "dXBkYXRlZCBjb250ZW50IGVuY29kZWQgaW4gWWpzIGZvcm1hdCB3aXRoIG5ldyBpbmZvcm1hdGlvbg==",
+#   "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+#   "createdAt": "2024-01-15T10:35:00.000Z",
+#   "updatedAt": "2024-01-15T12:15:00.000Z",
+#   "owner": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null
+#   }
+# }
+
+###
+
+### Update Document (Partial Update - Title Only)
+PUT http://localhost:3000/api/documents/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "title": "Just Update Title"
+}
+
+### Expected Response (200 OK):
+# {
+#   "id": "123e4567-e89b-12d3-a456-426614174000",
+#   "title": "Just Update Title",
+#   "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+fw==",
+#   "ownerId": "550e8400-e29b-41d4-a716-446655440000",
+#   "createdAt": "2024-01-15T10:35:00.000Z",
+#   "updatedAt": "2024-01-15T12:20:00.000Z",
+#   "owner": {
+#     "id": "550e8400-e29b-41d4-a716-446655440000",
+#     "email": "john.doe@example.com",
+#     "name": "John Doe",
+#     "avatar": null
+#   }
+# }
+
+###
+
+### Delete Document
+DELETE http://localhost:3000/api/documents/123e4567-e89b-12d3-a456-426614174000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+### Expected Response (204 No Content):
+# (Empty response body)
+
+###
+
+### Error Examples
+
+### Validation Error (400 Bad Request)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "name": "",
+  "password": "123"
+}
+
+### Expected Response (400 Bad Request):
+# {
+#   "error": "Validation error",
+#   "details": [
+#     {
+#       "field": "email",
+#       "message": "Invalid email"
+#     },
+#     {
+#       "field": "name",
+#       "message": "String must contain at least 1 character(s)"
+#     },
+#     {
+#       "field": "password",
+#       "message": "String must contain at least 6 character(s)"
+#     }
+#   ]
+# }
+
+###
+
+### Unauthorized Access (401)
+GET http://localhost:3000/api/documents
+
+### Expected Response (401 Unauthorized):
+# {
+#   "error": "Access token required"
+# }
+
+###
+
+### Invalid Token (401)
+GET http://localhost:3000/api/documents
+Authorization: Bearer invalid-token
+
+### Expected Response (401 Unauthorized):
+# {
+#   "error": "Invalid token"
+# }
+
+###
+
+### Document Not Found (404)
+GET http://localhost:3000/api/documents/non-existent-id
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+### Expected Response (404 Not Found):
+# {
+#   "error": "Document not found"
+# }
+
+###
+
+### User Already Exists (409)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "existing@example.com",
+  "name": "Existing User",
+  "password": "password123"
+}
+
+### Expected Response (409 Conflict):
+# {
+#   "error": "User already exists with this email"
+# }
+
+###
+
+### Rate Limit Exceeded (429)
+### (After making 100+ requests in a minute)
+
+### Expected Response (429 Too Many Requests):
+# {
+#   "error": "Too many requests from this IP, please try again later."
+# }
+
+###
+
+### WebSocket Connection Example (JavaScript)
+### Use this in your frontend or testing tool:
+
+# const socket = io('http://localhost:3000', {
+#   auth: {
+#     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+#   }
+# });
+# 
+# // Join document room
+# socket.emit('document:join', { 
+#   documentId: '123e4567-e89b-12d3-a456-426614174000' 
+# });
+# 
+# // Listen for document state
+# socket.on('document:state', (data) => {
+#   console.log('Document state:', data);
+# });
+# 
+# // Send document edit
+# socket.emit('document:edit', {
+#   documentId: '123e4567-e89b-12d3-a456-426614174000',
+#   update: 'base64-encoded-yjs-update'
+# });
+# 
+# // Update presence
+# socket.emit('presence:update', {
+#   documentId: '123e4567-e89b-12d3-a456-426614174000',
+#   cursor: { x: 150, y: 200 },
+#   selection: { start: 10, end: 25 }
+# });
