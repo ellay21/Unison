@@ -10,12 +10,12 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL!,
   
   // Redis
-  redisUrl: process.env.REDIS_URL,
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   
   // JWT
   jwtSecret: process.env.JWT_SECRET!,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET!,
-  jwtExpiresIn: '30m',
+  jwtExpiresIn: '15m',
   jwtRefreshExpiresIn: '7d',
   
   // OAuth
@@ -29,7 +29,7 @@ export const config = {
   },
   
   // CORS
-  frontendUrl: process.env.FRONTEND_URL,
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
 };
 
 // Validate required environment variables

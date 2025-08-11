@@ -1,124 +1,78 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User as PrismaUser } from '@prisma/client';
 import { CreateUser, UpdateUser } from '../models/types';
 import bcrypt from 'bcryptjs';
-
 
 const prisma = new PrismaClient();
 
 export class UserService {
-  async findById(id: string) {
+  async findById(id: string): Promise<PrismaUser | null> {
     return await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<PrismaUser | null> {
     return await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
-  async create(userData: CreateUser) {
+  async create(userData: CreateUser): Promise<PrismaUser> {
     return await prisma.user.create({
       data: userData,
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
-  async update(id: string, userData: UpdateUser) {
+  async update(id: string, userData: UpdateUser): Promise<PrismaUser> {
     return await prisma.user.update({
       where: { id },
       data: userData,
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
-  async findOrCreateOAuthUser(userData: CreateUser) {
-    const existingUser = await this.findByEmail(userData.email);
-    
+  async findOrCreateOAuthUser(userData: any): Promise<PrismaUser> {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        providerId: userData.providerId,
+        provider: userData.provider,
+      },
+    });
+
     if (existingUser) {
       return await this.update(existingUser.id, {
         name: userData.name,
         avatar: userData.avatar,
       });
     }
-    
-    return await this.create(userData);
+
+    const newUser = await prisma.user.create({
+      data: {
+        ...userData,
+        password: null, // OAuth users don't have a password
+      },
+    });
+    return newUser;
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<PrismaUser> {
     return await prisma.user.delete({
       where: { id },
     });
   }
 
-  async createWithPassword(userData: CreateUser & { password?: string }) {
+  async createWithPassword(userData: CreateUser & { password?: string }): Promise<PrismaUser> {
     const hashedPassword = userData.password ? await bcrypt.hash(userData.password, 12) : null;
-    
     return await prisma.user.create({
       data: {
         ...userData,
         password: hashedPassword,
       },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
-  async verifyPassword(email: string, password: string): Promise<any | null> {
+  async verifyPassword(email: string, password: string): Promise<Omit<PrismaUser, 'password'> | null> {
     const user = await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        provider: true,
-        password: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
 
     if (!user || !user.password) {
@@ -130,7 +84,6 @@ export class UserService {
       return null;
     }
 
-    // Remove password from returned user object
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
