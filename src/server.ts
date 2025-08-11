@@ -1,6 +1,5 @@
 import express from 'express';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import passport from 'passport';
@@ -56,7 +55,6 @@ app.get('/health', (req, res) => {
 // Start server
 const startServer = async () => {
   try {
-    // Test Redis connection
     await redisClient.ping();
     logger.info('Redis connected successfully');
 

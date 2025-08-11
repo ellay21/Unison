@@ -17,7 +17,7 @@ const router = Router();
 
 // Auth routes
 router.post('/auth/login', validateBody(LoginSchema), AuthController.login);
-router.post('/auth/register', validateBody(RegisterSchema), AuthController.register); // Added register route
+router.post('/auth/register', validateBody(RegisterSchema), AuthController.register);
 router.post('/auth/refresh', validateBody(RefreshTokenSchema), AuthController.refresh);
 router.post('/auth/logout', AuthController.logout);
 
